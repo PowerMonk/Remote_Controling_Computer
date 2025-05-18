@@ -28,38 +28,58 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.btnControl = new System.Windows.Forms.Button();
+            this.btnMensaje = new System.Windows.Forms.Button();
+            this.btnArchivo = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // pictureBox1
+            // btnControl
             // 
-            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(533, 292);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.btnControl.Location = new System.Drawing.Point(21, 12);
+            this.btnControl.Name = "btnControl";
+            this.btnControl.Size = new System.Drawing.Size(146, 88);
+            this.btnControl.TabIndex = 0;
+            this.btnControl.Text = "Controlar la computadora del servidor";
+            this.btnControl.UseVisualStyleBackColor = true;
+            // 
+            // btnMensaje
+            // 
+            this.btnMensaje.Location = new System.Drawing.Point(22, 106);
+            this.btnMensaje.Name = "btnMensaje";
+            this.btnMensaje.Size = new System.Drawing.Size(145, 82);
+            this.btnMensaje.TabIndex = 1;
+            this.btnMensaje.Text = "Enviar un mensaje al servidor";
+            this.btnMensaje.UseVisualStyleBackColor = true;
+            // 
+            // btnArchivo
+            // 
+            this.btnArchivo.Location = new System.Drawing.Point(21, 194);
+            this.btnArchivo.Name = "btnArchivo";
+            this.btnArchivo.Size = new System.Drawing.Size(146, 78);
+            this.btnArchivo.TabIndex = 2;
+            this.btnArchivo.Text = "Enviar un archivo al servidor";
+            this.btnArchivo.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(533, 292);
-            this.Controls.Add(this.pictureBox1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Controls.Add(this.btnArchivo);
+            this.Controls.Add(this.btnMensaje);
+            this.Controls.Add(this.btnControl);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
-            this.Text = "Form1";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.Text = "Remote Control Client";
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button btnControl;
+        private System.Windows.Forms.Button btnMensaje;
+        private System.Windows.Forms.Button btnArchivo;
     }
 }
 

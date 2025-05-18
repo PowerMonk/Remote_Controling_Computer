@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Remote_Control_Client
 {
@@ -11,22 +12,38 @@ namespace Remote_Control_Client
     {
         TcpClient client;
         NetworkStream stream;
+        System.Windows.Forms.ProgressBar progressBar;
+        string archivoSeleccionado = string.Empty;
+        string ServerIp = "192.168.1.153";
+        const int ServerPort = 5000;
+        const int FileServerPort = 12345;
 
         public Form1()
         {
             InitializeComponent();
             ConectarServidor();
+            btnControl.Click += btnControl_Click;
+            btnMensaje.Click += btnMensaje_Click;
+            btnArchivo.Click += btnArchivo_Click;
+
+            // Inicializar la ProgressBar
+            progressBar = new System.Windows.Forms.ProgressBar
+            {
+                Dock = DockStyle.Bottom,
+                Minimum = 0,
+                Maximum = 100,
+                Visible = false // Oculta inicialmente
+            };
+            Controls.Add(progressBar);
+
         }
 
         private void ConectarServidor()
         {
             try
             {
-                client = new TcpClient("192.168.1.153", 5000); // Cambia la IP según sea necesario
+                client = new TcpClient(ServerIp, ServerPort); // Cambiar la IP/Puerto según sea necesario
                 stream = client.GetStream();
-
-                // Iniciar un thread para recibir capturas
-                new System.Threading.Thread(RecibirCapturas) { IsBackground = true }.Start();
             }
             catch (Exception ex)
             {
@@ -34,52 +51,96 @@ namespace Remote_Control_Client
             }
         }
 
-        private void RecibirCapturas()
+        private void btnControl_Click(object sender, EventArgs e)
         {
+            // Por si queremos ocultar el Form1
+            //this.Hide();
+
+            // Mostrar el formulario de control remoto
+            FormControl control = new FormControl(client, stream);
+            control.FormClosed += (s, args) => this.Show(); // Mostrar Form1 cuando se cierre el otro
+            control.Show();
+        }
+
+        private void btnMensaje_Click(object sender, EventArgs e)
+        {
+            // Por si lo queremos ocultar
+            //this.Hide();
+
+            // Mostrar el formulario de control remoto
+            FormMensaje control = new FormMensaje(client, stream);
+            control.FormClosed += (s, args) => this.Show(); // Mostrar Form1 cuando se cierre el otro
+            control.Show();
+        }
+        private void btnArchivo_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if(ofd.ShowDialog() == DialogResult.OK)
+            {
+                archivoSeleccionado = ofd.FileName;
+                EnviarArchivo();
+            }
+        }
+        private void EnviarArchivo()
+        {
+            if (string.IsNullOrEmpty(archivoSeleccionado))
+            {
+                MessageBox.Show("No se ha seleccionado ningún archivo.");
+                return;
+            }
+
             try
             {
-                while (true)
+                using (TcpClient clienteArchivos = new TcpClient(ServerIp, FileServerPort)) // Usamos un nombre diferente para el cliente de archivos
+                using (NetworkStream fileStream = clienteArchivos.GetStream()) // Obtenemos el flujo del nuevo cliente
+                using (BinaryWriter writer = new BinaryWriter(fileStream))
                 {
-                    // Leer el tamaño de la imagen
-                    byte[] tamañoBytes = new byte[4];
-                    stream.Read(tamañoBytes, 0, tamañoBytes.Length);
-                    int tamaño = BitConverter.ToInt32(tamañoBytes, 0);
-
-                    // Leer la imagen
-                    byte[] imagenBytes = new byte[tamaño];
-                    int bytesLeidos = 0;
-                    while (bytesLeidos < tamaño)
+                    FileInfo fileInfo = new FileInfo(archivoSeleccionado);
+                    writer.Write(fileInfo.Name);
+                    writer.Write(fileInfo.Length);
+                    byte[] buffer = new byte[4096];
+                    using (FileStream fs = new FileStream(archivoSeleccionado, FileMode.Open))
                     {
-                        bytesLeidos += stream.Read(imagenBytes, bytesLeidos, tamaño - bytesLeidos);
+                        int bytesSent = 0;
+                        int bytesRead;
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fileStream.Write(buffer, 0, bytesRead);
+                            bytesSent += bytesRead;
+                            ActualizarProgress((int)(bytesSent * 100 / fileInfo.Length));
+                        }
                     }
-
-                    // Mostrar la imagen en un PictureBox
-                    using (MemoryStream ms = new MemoryStream(imagenBytes))
-                    {
-                        //Image imagenOriginal = Image.FromStream(ms);
-
-                        pictureBox1.Image = Image.FromStream(ms);
-                    }
+                    MessageBox.Show("Archivo enviado correctamente.", "El archivo se envió correctamente", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al recibir capturas: " + ex.Message);
+                MessageBox.Show("Error al enviar archivo: " + ex.Message);
             }
         }
 
-        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+
+        private void ActualizarProgress(int porcentaje)
         {
-            // Enviar movimiento del mouse al servidor
-            EnviarMensaje($"MOVE|{e.X}|{e.Y}");
+            if (InvokeRequired)
+            {
+                Invoke(new Action<int>(ActualizarProgress), porcentaje);
+                return;
+            }
+
+            if (!progressBar.Visible)
+            {
+                progressBar.Visible = true; // Mostrar la ProgressBar al iniciar
+            }
+
+            progressBar.Value = porcentaje;
+
+            if (porcentaje >= 100)
+            {
+                progressBar.Visible = false; // Ocultar la ProgressBar al finalizar
+            }
         }
 
-        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
-        {
-            // Enviar clic del mouse al servidor
-            string boton = e.Button == MouseButtons.Left ? "LEFT" : "RIGHT";
-            EnviarMensaje($"CLICK|{boton}");
-        }
 
         private void EnviarMensaje(string mensaje)
         {
