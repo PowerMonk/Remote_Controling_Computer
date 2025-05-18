@@ -22,7 +22,7 @@ namespace Remote_Control_Client
         {
             try
             {
-                client = new TcpClient("127.0.0.1", 5000); // Cambia la IP según sea necesario
+                client = new TcpClient("192.168.1.153", 5000); // Cambia la IP según sea necesario
                 stream = client.GetStream();
 
                 // Iniciar un thread para recibir capturas
@@ -41,7 +41,6 @@ namespace Remote_Control_Client
                 while (true)
                 {
                     // Leer el tamaño de la imagen
-                    // 4 porque un int ocupa 4 bytes y estan llegando ints
                     byte[] tamañoBytes = new byte[4];
                     stream.Read(tamañoBytes, 0, tamañoBytes.Length);
                     int tamaño = BitConverter.ToInt32(tamañoBytes, 0);
@@ -57,8 +56,9 @@ namespace Remote_Control_Client
                     // Mostrar la imagen en un PictureBox
                     using (MemoryStream ms = new MemoryStream(imagenBytes))
                     {
-                        Image imagen = Image.FromStream(ms);
-                        pictureBox1.Image = imagen;
+                        //Image imagenOriginal = Image.FromStream(ms);
+
+                        pictureBox1.Image = Image.FromStream(ms);
                     }
                 }
             }
