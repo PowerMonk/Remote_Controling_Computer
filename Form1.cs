@@ -98,7 +98,7 @@ namespace Remote_Control_Client
                     FileInfo fileInfo = new FileInfo(archivoSeleccionado);
                     writer.Write(fileInfo.Name);
                     writer.Write(fileInfo.Length);
-                    byte[] buffer = new byte[4096];
+                    byte[] buffer = new byte[8192];
                     using (FileStream fs = new FileStream(archivoSeleccionado, FileMode.Open))
                     {
                         int bytesSent = 0;
@@ -153,6 +153,13 @@ namespace Remote_Control_Client
             {
                 MessageBox.Show("Error al enviar mensaje: " + ex.Message);
             }
+        }
+        // Asegurarse de limpiar recursos al cerrar el formulario
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            if (stream != null) stream.Close();
+            if (client != null) client.Close();
         }
     }
 }
