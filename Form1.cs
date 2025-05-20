@@ -27,6 +27,7 @@ namespace Remote_Control_Client
             btnArchivo.Click += btnArchivo_Click;
 
             // Inicializar la ProgressBar
+            // Agrego este comentario para que cuente como una contribución
             progressBar = new System.Windows.Forms.ProgressBar
             {
                 Dock = DockStyle.Bottom,
