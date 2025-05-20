@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Globalization; // Para CultureInfo.InvariantCulture
+using System.Globalization; 
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -34,7 +34,6 @@ namespace Remote_Control_Client
             // Suscribirse a eventos del PictureBox y del Formulario
             PictureBoxPantalla.MouseDown += PictureBoxPantalla_MouseDown;
             PictureBoxPantalla.MouseUp += PictureBoxPantalla_MouseUp; // Opcional, para clics completos
-            // PictureBoxPantalla.MouseMove += PictureBoxPantalla_MouseMove; // Si quieres enviar movimiento continuo
 
             this.KeyPreview = true; // Importante para que el Form capture teclas antes que los controles hijos
             this.KeyDown += FormControl_KeyDown;
@@ -68,8 +67,6 @@ namespace Remote_Control_Client
                     int bytesLeidos = 0;
                     while (bytesLeidos < tamaño)
                     {
-                        //int leidoAhora = stream.Read(imagenBytes, bytesLeidos, tamaño - bytesLeidos);
-                        //if (leidoAhora == 0) throw new IOException("Se cerró la conexión mientras se leía la imagen");
                         bytesLeidos += stream.Read(imagenBytes, bytesLeidos, tamaño - bytesLeidos);
                     }
 
@@ -125,7 +122,7 @@ namespace Remote_Control_Client
                 {
                     byte[] datosComando = Encoding.UTF8.GetBytes(comando);
                     stream.Write(datosComando, 0, datosComando.Length);
-                    stream.Flush(); // Asegurar que se envíe inmediatamente
+                    stream.Flush(); 
                 }
                 catch (IOException ex)
                 {
@@ -173,22 +170,6 @@ namespace Remote_Control_Client
                 EnviarComando(comando);
             }
         }
-
-
-        // Opcional: Para enviar movimiento del mouse (puede generar mucho tráfico)
-        /*
-        private void PictureBoxPantalla_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.None) // Solo mover si no hay un botón presionado (o ajusta según necesidad)
-            {
-                double ratioX = (double)e.X / PictureBoxPantalla.Width;
-                double ratioY = (double)e.Y / PictureBoxPantalla.Height;
-                string comando = $"MOUSE:MOVE:{ratioX.ToString(CultureInfo.InvariantCulture)}:{ratioY.ToString(CultureInfo.InvariantCulture)}";
-                EnviarComando(comando);
-            }
-        }
-        */
-
         private void FormControl_KeyDown(object sender, KeyEventArgs e)
         {
             // Convertimos KeyCode a su valor entero para enviarlo
@@ -211,8 +192,6 @@ namespace Remote_Control_Client
             base.OnFormClosing(e);
             // No es necesario cerrar explícitamente client y stream aquí si se pasan desde Form1
             // y Form1 gestiona su ciclo de vida. Si FormControl es el dueño, entonces sí.
-            // if (stream != null) stream.Close();
-            // if (client != null) client.Close();
         }
     }
 }

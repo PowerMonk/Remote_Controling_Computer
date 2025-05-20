@@ -53,9 +53,6 @@ namespace Remote_Control_Client
 
         private void btnControl_Click(object sender, EventArgs e)
         {
-            // Por si queremos ocultar el Form1
-            //this.Hide();
-
             // Mostrar el formulario de control remoto
             FormControl control = new FormControl(client, stream);
             control.FormClosed += (s, args) => this.Show(); // Mostrar Form1 cuando se cierre el otro
@@ -64,12 +61,9 @@ namespace Remote_Control_Client
 
         private void btnMensaje_Click(object sender, EventArgs e)
         {
-            // Por si lo queremos ocultar
-            //this.Hide();
-
             // Mostrar el formulario de control remoto
             FormMensaje control = new FormMensaje(client, stream);
-            control.FormClosed += (s, args) => this.Show(); // Mostrar Form1 cuando se cierre el otro
+            control.FormClosed += (s, args) => this.Show(); 
             control.Show();
         }
         private void btnArchivo_Click(object sender, EventArgs e)
